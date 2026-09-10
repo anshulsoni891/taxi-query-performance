@@ -4,7 +4,7 @@
 > Demonstrate end-to-end diagnosis and optimization of heavy SQL analytical queries on a **2,500,000 row dataset**, measuring exact execution speedups and plan shifts via PostgreSQL `EXPLAIN ANALYZE`.
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/anshulsoni891/taxi-query-performance)
-[![Streamlit App](https://img.shields.io/badge/Streamlit-Live_Dashboard-FF4B4B?logo=streamlit)](https://share.streamlit.io)
+[![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=anshulsoni891/taxi-query-performance&branch=master&mainModule=app.py)
 
 ---
 
@@ -81,10 +81,8 @@ Run the live visual interactive dashboard locally with:
 ```bash
 streamlit run app.py
 ```
-Or deploy instantly for free to **Streamlit Community Cloud**:
-1. Go to [share.streamlit.io](https://share.streamlit.io)
-2. Connect repository: `anshulsoni891/taxi-query-performance`
-3. Main file path: `app.py`
+Or deploy instantly for free with 1-click on Streamlit Cloud:  
+[![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=anshulsoni891/taxi-query-performance&branch=master&mainModule=app.py)
 
 ---
 
