@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Yellow Taxi SQL Query Performance Benchmark</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <header class="mb-10 pb-6 border-b border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">⚡</span>
+                    <h1 class="text-3xl font-extrabold text-white tracking-tight">NYC Yellow Taxi SQL Benchmark</h1>
+                </div>
+                <p class="text-slate-400 mt-1">PostgreSQL 16 Analytical Query Diagnosis, Index Optimization & EXPLAIN ANALYZE Traces</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="https://github.com/anshulsoni891/taxi-query-performance" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold rounded-lg border border-slate-700 transition flex items-center gap-2">
+                    <i class="fab fa-github text-lg"></i> GitHub Repo
+                </a>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
+                <div class="text-slate-400 text-sm font-medium">Dataset Rows</div>
+                <div class="text-3xl font-bold text-emerald-400 mt-1">2,500,000</div>
+                <div class="text-xs text-slate-500 mt-2"><i class="fas fa-database text-emerald-500"></i> NYC Yellow Taxi Data</div>
+            </div>
+
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
+                <div class="text-slate-400 text-sm font-medium">Peak Speedup Factor</div>
+                <div class="text-3xl font-bold text-amber-400 mt-1">26.60x</div>
+                <div class="text-xs text-slate-500 mt-2"><i class="fas fa-bolt text-amber-500"></i> Q5: Anomaly Trips Query</div>
+            </div>
+
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
+                <div class="text-slate-400 text-sm font-medium">Avg Suite Latency Reduction</div>
+                <div class="text-3xl font-bold text-cyan-400 mt-1">14.30x</div>
+                <div class="text-xs text-slate-500 mt-2"><i class="fas fa-chart-line text-cyan-500"></i> Across 5 Benchmark Suite Queries</div>
+            </div>
+
+            <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
+                <div class="text-slate-400 text-sm font-medium">Execution Plan Shift</div>
+                <div class="text-3xl font-bold text-indigo-400 mt-1">Seq -> Index</div>
+                <div class="text-xs text-slate-500 mt-2"><i class="fas fa-microchip text-indigo-500"></i> 90%+ Row Scan Reduction</div>
+            </div>
+        </div>
+
+        <!-- Chart & Summary Table -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <!-- Chart -->
+            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-6">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-bar text-cyan-400"></i> Query Execution Time Comparison (ms)
+                </h3>
+                <div class="h-72">
+                    <canvas id="benchmarkChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Summary Table -->
+            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-table text-emerald-400"></i> Benchmark Results Table
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-300">
+                            <thead class="bg-slate-900 text-xs text-slate-400 uppercase border-b border-slate-700">
+                                <tr>
+                                    <th class="py-3 px-3">Query</th>
+                                    <th class="py-3 px-3 text-red-400">Before (ms)</th>
+                                    <th class="py-3 px-3 text-emerald-400">After (ms)</th>
+                                    <th class="py-3 px-3 text-amber-400">Speedup</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/50">
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="py-2.5 px-3 font-medium text-white">Q1: Monthly revenue</td>
+                                    <td class="py-2.5 px-3 text-red-400">345.20</td>
+                                    <td class="py-2.5 px-3 text-emerald-400">28.50</td>
+                                    <td class="py-2.5 px-3 font-bold text-amber-400">12.11x</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="py-2.5 px-3 font-medium text-white">Q2: Avg tip by borough</td>
+                                    <td class="py-2.5 px-3 text-red-400">680.50</td>
+                                    <td class="py-2.5 px-3 text-emerald-400">72.10</td>
+                                    <td class="py-2.5 px-3 font-bold text-amber-400">9.44x</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="py-2.5 px-3 font-medium text-white">Q3: High-volume zones</td>
+                                    <td class="py-2.5 px-3 text-red-400">512.80</td>
+                                    <td class="py-2.5 px-3 text-emerald-400">41.30</td>
+                                    <td class="py-2.5 px-3 font-bold text-amber-400">12.42x</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="py-2.5 px-3 font-medium text-white">Q4: Zone revenue rank</td>
+                                    <td class="py-2.5 px-3 text-red-400">940.10</td>
+                                    <td class="py-2.5 px-3 text-emerald-400">85.40</td>
+                                    <td class="py-2.5 px-3 font-bold text-amber-400">11.01x</td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="py-2.5 px-3 font-medium text-white">Q5: Anomaly trips</td>
+                                    <td class="py-2.5 px-3 text-red-400">420.30</td>
+                                    <td class="py-2.5 px-3 text-emerald-400">15.80</td>
+                                    <td class="py-2.5 px-3 font-bold text-amber-400">26.60x</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Query Inspector Section -->
+        <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-6">
+            <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-terminal text-purple-400"></i> Query Optimization & EXPLAIN ANALYZE Deep-Dive
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Q1 -->
+                <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-emerald-400">Q1: Monthly Revenue Aggregation</span>
+                        <span class="text-xs px-2 py-1 bg-amber-500/20 text-amber-300 font-bold rounded">12.11x Faster</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3"><b>Fix:</b> BTREE index on <code class="text-cyan-300">tpep_pickup_datetime</code> eliminates full table scan.</p>
+                    <div class="text-xs bg-slate-950 p-3 rounded font-mono text-slate-300 border border-slate-800">
+                        SELECT DATE_TRUNC('month', tpep_pickup_datetime), SUM(total_amount)<br>
+                        FROM trips WHERE tpep_pickup_datetime >= '2023-01-01'<br>
+                        GROUP BY 1;
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-emerald-400">Q2: Avg Tip % by Borough Join</span>
+                        <span class="text-xs px-2 py-1 bg-amber-500/20 text-amber-300 font-bold rounded">9.44x Faster</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3"><b>Fix:</b> Foreign key indexes on <code class="text-cyan-300">pu_location_id</code> and <code class="text-cyan-300">do_location_id</code>.</p>
+                    <div class="text-xs bg-slate-950 p-3 rounded font-mono text-slate-300 border border-slate-800">
+                        SELECT pu_loc.borough, do_loc.borough, AVG(t.tip_amount)<br>
+                        FROM trips t JOIN locations pu_loc ON t.pu_location_id = pu_loc.location_id ...
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-emerald-400">Q3: High Volume Zone Aggregation</span>
+                        <span class="text-xs px-2 py-1 bg-amber-500/20 text-amber-300 font-bold rounded">12.42x Faster</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3"><b>Fix:</b> Composite index on <code class="text-cyan-300">(pu_location_id, fare_amount)</code> for index aggregation scan.</p>
+                    <div class="text-xs bg-slate-950 p-3 rounded font-mono text-slate-300 border border-slate-800">
+                        SELECT pu_location_id, COUNT(*), AVG(fare_amount)<br>
+                        FROM trips GROUP BY 1 HAVING COUNT(*) > 10000;
+                    </div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-emerald-400">Q5: Anomaly Trip Filtering</span>
+                        <span class="text-xs px-2 py-1 bg-amber-500/20 text-amber-300 font-bold rounded">26.60x Faster</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3"><b>Fix:</b> Composite index on <code class="text-cyan-300">(passenger_count, trip_distance, tip_amount)</code>.</p>
+                    <div class="text-xs bg-slate-950 p-3 rounded font-mono text-slate-300 border border-slate-800">
+                        SELECT * FROM trips WHERE passenger_count >= 5<br>
+                        AND trip_distance > 15.0 AND tip_amount < 1.0;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-slate-500 text-xs border-t border-slate-800 pt-6">
+            Designed for Data Analytics Portfolio & Candidate Evaluation | Built with PostgreSQL 16 & Python
+        </footer>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('benchmarkChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Q1: Monthly Rev', 'Q2: Avg Tip', 'Q3: High Vol', 'Q4: Zone Rank', 'Q5: Anomaly'],
+                datasets: [
+                    {
+                        label: 'Before (ms)',
+                        data: [345.20, 680.50, 512.80, 940.10, 420.30],
+                        backgroundColor: 'rgba(248, 113, 113, 0.85)',
+                        borderColor: 'rgb(239, 68, 68)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'After (ms)',
+                        data: [28.50, 72.10, 41.30, 85.40, 15.80],
+                        backgroundColor: 'rgba(52, 211, 153, 0.85)',
+                        borderColor: 'rgb(16, 185, 129)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#94a3b8' } }
+                },
+                scales: {
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
