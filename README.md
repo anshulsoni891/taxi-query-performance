@@ -3,13 +3,16 @@
 
 > Demonstrate end-to-end diagnosis and optimization of heavy SQL analytical queries on a **2,500,000 row dataset**, measuring exact execution speedups and plan shifts via PostgreSQL `EXPLAIN ANALYZE`.
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/anshulsoni891/taxi-query-performance)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live_Dashboard-FF4B4B?logo=streamlit)](https://share.streamlit.io)
+
 ---
 
 ## Executive Summary & Objective
 
 In production analytics environments, sub-optimal SQL queries lead to long query execution times, excessive memory consumption, and high infrastructure costs. This project benchmarks 5 analytical business queries against a **2.5 Million+ row dataset** of NYC Yellow Taxi trip records in PostgreSQL.
 
-By applying targeted indexing strategies (BTREE, composite indexes, covering indexes) and CTE query rewrites, overall execution latency across the suite was reduced by up to **26x**, shifting execution plans from expensive **Sequential Scans** to targeted **Bitmap Index Scans**.
+By applying targeted indexing strategies (BTREE, composite indexes, covering indexes) and CTE query rewrites, overall execution latency across the suite was reduced by up to **26.6x**, shifting execution plans from expensive **Sequential Scans** to targeted **Bitmap Index Scans**.
 
 ---
 
@@ -17,10 +20,11 @@ By applying targeted indexing strategies (BTREE, composite indexes, covering ind
 
 | Layer | Tool | Description |
 |---|---|---|
-| **Database Engine** | PostgreSQL 16 (Docker / Native) | Relational database benchmarking target |
+| **Database Engine** | PostgreSQL 16 / DuckDB | Relational database benchmarking target |
 | **Data Source** | NYC TLC Yellow Taxi Trip Data | 2.5M+ trip records + 263 NYC Taxi Zone Locations |
 | **Analysis** | `EXPLAIN ANALYZE` | Execution plan diagnosis, cost tracking, and scan profiling |
 | **ETL & Execution** | Python (pandas, duckdb) | Dataset synthesis, database population, and runner |
+| **Web Dashboard** | Streamlit | Interactive query & EXPLAIN ANALYZE visual inspector |
 | **Documentation** | Markdown / GitHub README | Executive narrative, result table, and evidence logs |
 
 ---
@@ -30,6 +34,7 @@ By applying targeted indexing strategies (BTREE, composite indexes, covering ind
 ```
 taxi-query-performance/
 ├── README.md                          # Comprehensive benchmark story & findings
+├── app.py                             # Interactive Streamlit Web Application
 ├── schema.sql                         # PostgreSQL table DDL definitions
 ├── load_data.sql                      # \COPY bulk loading script
 ├── load_data.py                       # Python data generation & ETL pipeline
@@ -60,13 +65,26 @@ taxi-query-performance/
 
 The following table summarizes the measured execution times and row scans before and after optimization on the **2,500,000 row dataset**:
 
-| Query                  |   Before (ms) |   After (ms) | Fix Applied                   | Rows Scanned (Before / After)   | Speedup   |
-|------------------------|---------------|--------------|-------------------------------|---------------------------------|-----------|
-| Q1: Monthly revenue    |         345.2 |         28.5 | Index on pickup_datetime      | 2,500,000 / 412,500             | 12.11x    |
-| Q2: Avg tip by borough |         680.5 |         72.1 | Index on pu/do_location_id    | 2,500,000 / 520,000             | 9.44x     |
-| Q3: High-volume zones  |         512.8 |         41.3 | Composite index on group cols | 2,500,000 / 285,000             | 12.42x    |
-| Q4: Zone revenue rank  |         940.1 |         85.4 | Index + window optimization   | 2,500,000 / 310,000             | 11.01x    |
-| Q5: Anomaly trips      |         420.3 |         15.8 | Multi-column index            | 2,500,000 / 18,200              | 26.6x     |
+| Query | Before (ms) | After (ms) | Fix Applied | Rows Scanned (Before / After) | Speedup |
+|---|---|---|---|---|---|
+| Q1: Monthly revenue | 345.2 | 28.5 | Index on pickup_datetime | 2,500,000 / 412,500 | 12.11x |
+| Q2: Avg tip by borough | 680.5 | 72.1 | Index on pu/do_location_id | 2,500,000 / 520,000 | 9.44x |
+| Q3: High-volume zones | 512.8 | 41.3 | Composite index on group cols | 2,500,000 / 285,000 | 12.42x |
+| Q4: Zone revenue rank | 940.1 | 85.4 | Index + window optimization | 2,500,000 / 310,000 | 11.01x |
+| Q5: Anomaly trips | 420.3 | 15.8 | Multi-column index | 2,500,000 / 18,200 | 26.6x |
+
+---
+
+## Interactive Streamlit Web Application
+
+Run the live visual interactive dashboard locally with:
+```bash
+streamlit run app.py
+```
+Or deploy instantly for free to **Streamlit Community Cloud**:
+1. Go to [share.streamlit.io](https://share.streamlit.io)
+2. Connect repository: `anshulsoni891/taxi-query-performance`
+3. Main file path: `app.py`
 
 ---
 
@@ -132,6 +150,8 @@ Speedup: 12.11x Faster
 
 1. **Clone the repository & install dependencies**:
    ```bash
+   git clone https://github.com/anshulsoni891/taxi-query-performance.git
+   cd taxi-query-performance
    pip install -r requirements.txt
    ```
 
@@ -141,6 +161,7 @@ Speedup: 12.11x Faster
    python benchmark_runner.py
    ```
 
-3. **Inspect benchmark outputs**:
-   - `results/benchmark_results.csv` contains performance comparison numbers.
-   - `explain_output/` contains raw `EXPLAIN ANALYZE` execution logs before and after optimization.
+3. **Launch Live Web Dashboard**:
+   ```bash
+   streamlit run app.py
+   ```
