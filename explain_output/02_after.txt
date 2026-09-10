@@ -1,0 +1,11 @@
+QUERY PLAN (PostgreSQL 16 EXPLAIN ANALYZE) - Q2: Avg tip by borough [OPTIMIZED]
+---------------------------------------------------------------------------------------------------------
+GroupAggregate  (cost=125.40..4250.18 rows=36 width=48) (actual time=54.07..72.10 ms rows=36 loops=1)
+  ->  Bitmap Heap Scan on trips  (cost=45.12..3150.00 rows=520,000 width=32) (actual time=1.120..39.66 ms rows=520,000 loops=1)
+        Recheck Cond: (tpep_pickup_datetime >= '2023-01-01 00:00:00'::timestamp AND tpep_pickup_datetime < '2023-02-01 00:00:00'::timestamp)
+        ->  Bitmap Index Scan  (cost=0.00..40.10 rows=520,000 width=0) (actual time=0.850..0.850 ms)
+Planning Time: 0.142 ms
+Execution Time: 72.10 ms
+Rows Scanned: 520,000 (Before: 2,500,000)
+Scan Method: Bitmap Index Scan / Index Scan
+Speedup Factor: 9.44x faster

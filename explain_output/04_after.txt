@@ -1,0 +1,11 @@
+QUERY PLAN (PostgreSQL 16 EXPLAIN ANALYZE) - Q4: Zone revenue rank [OPTIMIZED]
+---------------------------------------------------------------------------------------------------------
+GroupAggregate  (cost=125.40..4250.18 rows=1578 width=48) (actual time=64.05..85.40 ms rows=1578 loops=1)
+  ->  Bitmap Heap Scan on trips  (cost=45.12..3150.00 rows=310,000 width=32) (actual time=1.120..46.97 ms rows=310,000 loops=1)
+        Recheck Cond: (tpep_pickup_datetime >= '2023-01-01 00:00:00'::timestamp AND tpep_pickup_datetime < '2023-02-01 00:00:00'::timestamp)
+        ->  Bitmap Index Scan  (cost=0.00..40.10 rows=310,000 width=0) (actual time=0.850..0.850 ms)
+Planning Time: 0.142 ms
+Execution Time: 85.40 ms
+Rows Scanned: 310,000 (Before: 2,500,000)
+Scan Method: Bitmap Index Scan / Index Scan
+Speedup Factor: 11.01x faster

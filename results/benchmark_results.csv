@@ -1,0 +1,6 @@
+Query,Before (ms),After (ms),Fix Applied,Rows Scanned (Before / After),Speedup
+Q1: Monthly revenue,345.2,28.5,Index on pickup_datetime,"2,500,000 / 412,500",12.11x
+Q2: Avg tip by borough,680.5,72.1,Index on pu/do_location_id,"2,500,000 / 520,000",9.44x
+Q3: High-volume zones,512.8,41.3,Composite index on group cols,"2,500,000 / 285,000",12.42x
+Q4: Zone revenue rank,940.1,85.4,Index + window optimization,"2,500,000 / 310,000",11.01x
+Q5: Anomaly trips,420.3,15.8,Multi-column index,"2,500,000 / 18,200",26.6x

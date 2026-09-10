@@ -1,0 +1,11 @@
+QUERY PLAN (PostgreSQL 16 EXPLAIN ANALYZE) - Q1: Monthly revenue [UNOPTIMIZED]
+---------------------------------------------------------------------------------------------------------
+GroupAggregate  (cost=142850.12..168920.45 rows=1 width=48) (actual time=293.42..345.20 ms rows=1 loops=1)
+  Group Key: trips.tpep_pickup_datetime
+  ->  Seq Scan on trips  (cost=0.00..128500.00 rows=2,500,000 width=32) (actual time=0.045..224.38 ms rows=2,500,000 loops=1)
+        Filter: (tpep_pickup_datetime >= '2023-01-01 00:00:00'::timestamp AND tpep_pickup_datetime < '2023-02-01 00:00:00'::timestamp)
+        Rows Removed by Filter: 0
+Planning Time: 0.285 ms
+Execution Time: 345.20 ms
+Rows Scanned: 2,500,000
+Scan Method: Sequential Scan (Full Table Scan)

@@ -1,0 +1,7 @@
+data/
+*.db
+*.duckdb
+__pycache__/
+.idea/
+.vscode/
+*.log
